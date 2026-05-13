@@ -127,13 +127,6 @@
       box-shadow: var(--shadow);
     }
 
-    .hero {
-      display: grid;
-      gap: 12px;
-      grid-template-columns: 1fr;
-      margin-bottom: 16px;
-    }
-
     .panel {
       background: var(--surface);
       border: 1px solid var(--line);
@@ -141,8 +134,6 @@
       box-shadow: var(--shadow);
       padding: 16px;
     }
-
-    .hero .panel { padding: 18px; }
 
     .status-strip {
       display: grid;
@@ -313,6 +304,12 @@
       background: color-mix(in srgb, var(--success) 18%, var(--surface));
       color: var(--success);
       border: 1px solid color-mix(in srgb, var(--success) 24%, transparent);
+    }
+
+    .btn:disabled,
+    input:disabled {
+      opacity: .5;
+      cursor: not-allowed;
     }
 
     .btn:active { transform: translateY(1px); }
@@ -492,7 +489,6 @@
       .system-layout { grid-template-columns: 1fr 1fr; }
       .mqtt-grid, .sys-grid, .move-grid { grid-template-columns: repeat(2, 1fr); }
       .sensor-grid { grid-template-columns: repeat(3, 1fr); }
-      .hero { grid-template-columns: 1fr; }
       .app { padding: 22px 22px calc(var(--tabbar-h) + 24px); }
     }
   </style>
@@ -517,13 +513,22 @@
       <div class="actions-top">
         <button class="icon-btn" id="themeToggle" aria-label="Cambiar tema">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3c0 0 0 0 0 0A7 7 0 0 0 21 12.79Z"/>
+            <path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79Z"/>
           </svg>
         </button>
       </div>
     </header>
 
     <main>
+      <div id="estopBanner" class="panel alert-panel danger" style="display:none; margin-bottom:16px;">
+        <div class="section-title" style="margin-bottom:0;">
+          <div>
+            <h2>Paro de emergencia activo</h2>
+            <p>Todos los comandos quedan bloqueados hasta liberar el E-stop.</p>
+          </div>
+        </div>
+      </div>
+
       <section id="screen-control" class="screen active">
         <div class="desktop-grid two">
           <div class="panel">
@@ -897,9 +902,59 @@
       });
     }
 
+    function isBlockedByEstop() {
+      return state.estop === true;
+    }
+
+    function showEstopBanner(active) {
+      const banner = $('#estopBanner');
+      banner.style.display = active ? 'block' : 'none';
+    }
+
+    function updateEstopUi() {
+      $('#estopState').textContent = String(state.estop);
+      $('#estopQuick').textContent = String(state.estop);
+
+      const btn = $('#estopBtn');
+      btn.textContent = state.estop ? 'Liberar paro de emergencia' : 'Paro de emergencia';
+
+      showEstopBanner(state.estop);
+
+      const selectorsToLock = [
+        '.move',
+        '.speed-btn',
+        '.arm-action',
+        '#sendArmBtn',
+        '#softStopBtn',
+        '#resetArmBtn',
+        '#servo1',
+        '#servo2',
+        '#servo3'
+      ];
+
+      selectorsToLock.forEach(selector => {
+        $$(selector).forEach(el => {
+          el.disabled = state.estop;
+        });
+      });
+    }
+
+    function guardCommand(actionName) {
+      if (!isBlockedByEstop()) return false;
+      log(`Bloqueado por E-stop: ${actionName}`, 'error');
+      return true;
+    }
+
     function publish(suffix, payload) {
       if (!state.client || !state.connected) {
         log('No hay conexión MQTT para publicar en ' + suffix, 'error');
+        return;
+      }
+
+      const allowedDuringEstop = ['cmd/estop'];
+
+      if (isBlockedByEstop() && !allowedDuringEstop.includes(suffix)) {
+        log(`Comando bloqueado por E-stop en ${suffix}`, 'error');
         return;
       }
 
@@ -1034,7 +1089,8 @@
           $('#robotLabel').textContent = data.online ? 'online' : 'offline';
           $('#modeLabel').textContent = data.mode || 'manual';
           $('#systemMode').textContent = data.mode || 'manual';
-          $('#estopState').textContent = String(!!data.estop);
+          state.estop = !!data.estop;
+          updateEstopUi();
           $('#heartbeat').textContent = stamp();
           syncSystemSummary();
         }
@@ -1069,6 +1125,8 @@
     }
 
     function sendMove(action, x = 0, y = 0) {
+      if (guardCommand(`movimiento ${action}`)) return;
+
       updateMoveFeedback(action, x, y);
       publish('cmd/move', {
         action,
@@ -1081,6 +1139,8 @@
     }
 
     function setSpeed(mode) {
+      if (guardCommand(`cambio de velocidad a ${mode}`)) return;
+
       state.speedMode = mode;
       setSpeedUi(mode);
       $('#speedModeLabel').textContent = mode;
@@ -1099,6 +1159,8 @@
     }
 
     function sendArmManual() {
+      if (guardCommand('envío manual de brazo')) return;
+
       const payload = {
         servo1: Number($('#servo1').value),
         servo2: Number($('#servo2').value),
@@ -1111,6 +1173,8 @@
     }
 
     function sendArmAction(action) {
+      if (guardCommand(`preset ${action}`)) return;
+
       $('#lastPreset').textContent = action;
       publish('cmd/arm/action', {
         action,
@@ -1155,11 +1219,14 @@
       setSpeedUi('medium');
       updateMoveFeedback('stop', 0, 0);
       syncSystemSummary();
+      updateEstopUi();
 
       $('#connectBtn').addEventListener('click', connectMqtt);
       $('#disconnectBtn').addEventListener('click', disconnectMqtt);
 
       $('#softStopBtn').addEventListener('click', () => {
+        if (guardCommand('parada normal')) return;
+
         sendMove('stop', 0, 0);
         publish('cmd/stop', {
           active: true,
@@ -1169,19 +1236,34 @@
       });
 
       $('#estopBtn').addEventListener('click', () => {
-        state.estop = !state.estop;
+        const nextState = !state.estop;
+        state.estop = nextState;
+
         publish('cmd/estop', {
           active: state.estop,
           source: state.operator,
           ts: nowTs()
         });
-        $('#estopState').textContent = String(state.estop);
-        $('#estopQuick').textContent = String(state.estop);
+
+        if (state.estop) {
+          updateMoveFeedback('stop', 0, 0);
+          $('#moveDirectionLabel').textContent = 'E-STOP';
+          $('#robotLabel').textContent = 'emergency-stop';
+          log('Paro de emergencia ACTIVADO. Toda acción queda bloqueada.', 'error');
+        } else {
+          $('#robotLabel').textContent = 'idle';
+          log('Paro de emergencia LIBERADO. El sistema queda habilitado, pero no reinicia solo.', 'ok');
+        }
+
+        updateEstopUi();
+        syncSystemSummary();
       });
 
       $('#sendArmBtn').addEventListener('click', sendArmManual);
 
       $('#resetArmBtn').addEventListener('click', () => {
+        if (guardCommand('restaurar servos')) return;
+
         $('#servo1').value = 152;
         $('#servo2').value = 112;
         $('#servo3').value = 93;
