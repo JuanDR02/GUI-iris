@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Iris Control Center</title>
   <meta name="color-scheme" content="light dark" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
@@ -45,147 +45,379 @@
       --danger-2: #c74b62;
       --shadow: 0 20px 48px rgba(0,0,0,.28);
     }
+
     * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Inter, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
     body { min-height: 100vh; }
     button, input, select { font: inherit; }
-    .app { max-width: 1100px; margin: 0 auto; padding: 16px 16px calc(var(--tabbar-h) + 18px); }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px 16px calc(var(--tabbar-h) + 18px);
+    }
+
     .topbar {
-      position: sticky; top: 0; z-index: 20;
-      display: flex; align-items: center; gap: 12px; justify-content: space-between;
-      padding: 14px 0 18px; background: linear-gradient(to bottom, var(--bg) 86%, rgba(0,0,0,0));
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: space-between;
+      padding: 14px 0 18px;
+      background: linear-gradient(to bottom, var(--bg) 86%, rgba(0,0,0,0));
       backdrop-filter: blur(8px);
     }
+
     .brand { display: flex; align-items: center; gap: 12px; }
+
     .logo {
-      width: 42px; height: 42px; border-radius: 14px; background: var(--surface);
-      display: grid; place-items: center; box-shadow: var(--shadow); border: 1px solid var(--line);
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: var(--surface);
+      display: grid;
+      place-items: center;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--line);
     }
+
     .brand h1 { font-size: 1.05rem; margin: 0; line-height: 1.1; }
     .brand p { margin: 2px 0 0; font-size: .82rem; color: var(--muted); }
+
     .actions-top { display: flex; gap: 10px; }
+
     .icon-btn {
-      width: 44px; height: 44px; border-radius: 14px; border: 1px solid var(--line);
-      background: var(--surface); color: var(--text); display: grid; place-items: center; cursor: pointer;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
       box-shadow: var(--shadow);
     }
+
     .hero {
-      display: grid; gap: 12px; grid-template-columns: 1fr; margin-bottom: 16px;
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr;
+      margin-bottom: 16px;
     }
+
     .panel {
-      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-      box-shadow: var(--shadow); padding: 16px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
     }
+
     .hero .panel { padding: 18px; }
+
     .status-strip {
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 12px;
     }
+
     .mini-card {
-      background: var(--surface-2); border-radius: 14px; padding: 12px; border: 1px solid var(--line);
+      background: var(--surface-2);
+      border-radius: 14px;
+      padding: 12px;
+      border: 1px solid var(--line);
     }
-    .mini-card span { display: block; font-size: .77rem; color: var(--muted); margin-bottom: 6px; }
+
+    .mini-card span {
+      display: block;
+      font-size: .77rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
     .mini-card strong { font-size: 1rem; }
-    .badge {
-      display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px;
-      font-size: .85rem; font-weight: 600; background: var(--surface-2); border: 1px solid var(--line);
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
     }
-    .dot { width: 9px; height: 9px; border-radius: 999px; background: var(--warning); }
-    .dot.online { background: var(--success); }
-    .section-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+
     .section-title h2 { margin: 0; font-size: 1rem; }
     .section-title p { margin: 3px 0 0; color: var(--muted); font-size: .84rem; }
+
     .tabs {
-      position: fixed; left: 50%; transform: translateX(-50%); bottom: 10px; z-index: 50;
-      width: min(720px, calc(100% - 16px)); display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
-      padding: 8px; background: color-mix(in srgb, var(--surface) 88%, transparent);
-      border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow); backdrop-filter: blur(12px);
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 10px;
+      z-index: 50;
+      width: min(720px, calc(100% - 16px));
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      padding: 8px;
+      background: color-mix(in srgb, var(--surface) 88%, transparent);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
     }
+
     .tab-btn {
-      border: 0; border-radius: 16px; background: transparent; color: var(--muted); padding: 12px 8px;
-      display: flex; flex-direction: column; gap: 4px; align-items: center; justify-content: center; min-height: 58px;
-      cursor: pointer; font-size: .78rem; font-weight: 700;
+      border: 0;
+      border-radius: 16px;
+      background: transparent;
+      color: var(--muted);
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+      justify-content: center;
+      min-height: 58px;
+      cursor: pointer;
+      font-size: .78rem;
+      font-weight: 700;
     }
-    .tab-btn.active { background: var(--surface-2); color: var(--text); }
+
+    .tab-btn.active {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+
     .tab-btn svg { width: 20px; height: 20px; }
+
     .screen { display: none; animation: fade .18s ease; }
     .screen.active { display: block; }
-    @keyframes fade { from { opacity: .45; transform: translateY(4px);} to { opacity: 1; transform: translateY(0);} }
 
-    .mqtt-grid, .sys-grid, .sensor-grid, .arm-actions, .three-col, .speed-grid {
-      display: grid; gap: 12px;
+    @keyframes fade {
+      from { opacity: .45; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .mqtt-grid, .sys-grid, .sensor-grid { grid-template-columns: 1fr; }
+
+    .mqtt-grid, .sys-grid, .sensor-grid, .arm-actions, .speed-grid, .system-layout {
+      display: grid;
+      gap: 12px;
+    }
+
+    .mqtt-grid, .sys-grid { grid-template-columns: 1fr; }
+
     .input-group { display: grid; gap: 8px; }
-    .input-group label { font-size: .82rem; color: var(--muted); font-weight: 600; }
-    .input, .select {
-      width: 100%; padding: 13px 14px; border-radius: 14px; border: 1px solid var(--line);
-      background: var(--surface-2); color: var(--text); outline: none;
+    .input-group label {
+      font-size: .82rem;
+      color: var(--muted);
+      font-weight: 600;
     }
-    .input:focus, .select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent); }
+
+    .input, .select {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      color: var(--text);
+      outline: none;
+    }
+
+    .input:focus, .select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+    }
+
     .btn {
-      border: 0; border-radius: 16px; padding: 13px 16px; cursor: pointer; font-weight: 700;
+      border: 0;
+      border-radius: 16px;
+      padding: 13px 16px;
+      cursor: pointer;
+      font-weight: 700;
       min-height: 48px;
     }
+
     .btn-primary { background: var(--primary); color: #fff; }
-    .btn-secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--line); }
+    .btn-secondary {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
     .btn-danger { background: var(--danger); color: #fff; }
-    .btn-danger.soft { background: color-mix(in srgb, var(--danger) 16%, var(--surface)); color: var(--danger); border: 1px solid color-mix(in srgb, var(--danger) 28%, transparent); }
-    .btn-success { background: color-mix(in srgb, var(--success) 18%, var(--surface)); color: var(--success); border: 1px solid color-mix(in srgb, var(--success) 24%, transparent); }
+    .btn-danger.soft {
+      background: color-mix(in srgb, var(--danger) 16%, var(--surface));
+      color: var(--danger);
+      border: 1px solid color-mix(in srgb, var(--danger) 28%, transparent);
+    }
+    .btn-success {
+      background: color-mix(in srgb, var(--success) 18%, var(--surface));
+      color: var(--success);
+      border: 1px solid color-mix(in srgb, var(--success) 24%, transparent);
+    }
+
     .btn:active { transform: translateY(1px); }
-    .button-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
     .dpad {
-      display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 72px); gap: 10px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 72px);
+      gap: 10px;
     }
+
     .dpad .move {
-      border: 1px solid var(--line); background: var(--surface-2); color: var(--text); border-radius: 20px;
-      font-weight: 800; cursor: pointer;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      color: var(--text);
+      border-radius: 20px;
+      font-weight: 800;
+      cursor: pointer;
     }
-    .dpad .move.primary { background: color-mix(in srgb, var(--primary) 14%, var(--surface)); color: var(--primary); }
-    .dpad .center-stop { background: color-mix(in srgb, var(--danger) 10%, var(--surface)); color: var(--danger); }
+
+    .dpad .move.primary {
+      background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+      color: var(--primary);
+    }
+
+    .dpad .center-stop {
+      background: color-mix(in srgb, var(--danger) 10%, var(--surface));
+      color: var(--danger);
+    }
+
     .speed-grid { grid-template-columns: repeat(3, 1fr); }
+
     .speed-btn {
-      border: 1px solid var(--line); background: var(--surface-2); color: var(--text); border-radius: 16px;
-      padding: 14px 10px; font-weight: 700; cursor: pointer;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      color: var(--text);
+      border-radius: 16px;
+      padding: 14px 10px;
+      font-weight: 700;
+      cursor: pointer;
     }
-    .speed-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    .speed-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
     .servo-card {
-      display: grid; gap: 10px; background: var(--surface-2); border: 1px solid var(--line);
-      border-radius: 16px; padding: 14px;
+      display: grid;
+      gap: 10px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
     }
-    .servo-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+
+    .servo-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
     .servo-head strong { font-size: .95rem; }
     .servo-head span { color: var(--muted); font-size: .82rem; }
+
     .value-box {
-      min-width: 72px; text-align: center; padding: 10px 10px; background: var(--surface); border-radius: 12px;
-      border: 1px solid var(--line); font-weight: 800;
+      min-width: 72px;
+      text-align: center;
+      padding: 10px 10px;
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      font-weight: 800;
     }
+
     input[type="range"] { width: 100%; accent-color: var(--primary); }
+
     .arm-actions { grid-template-columns: repeat(2, 1fr); }
     .sensor-grid { grid-template-columns: repeat(2, 1fr); }
+
     .sensor-card {
-      background: var(--surface-2); border: 1px solid var(--line); border-radius: 16px; padding: 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
     }
-    .sensor-card span { display: block; font-size: .8rem; color: var(--muted); margin-bottom: 6px; }
+
+    .sensor-card span {
+      display: block;
+      font-size: .8rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
     .sensor-card strong { font-size: 1.35rem; }
-    .sensor-card small { display: block; margin-top: 8px; color: var(--muted); }
+
+    .sensor-card small {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+    }
+
     .log {
-      background: #111; color: #d5f8d6; border-radius: 16px; padding: 14px; min-height: 180px; max-height: 260px;
-      overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8rem; line-height: 1.5;
+      background: #111;
+      color: #d5f8d6;
+      border-radius: 16px;
+      padding: 14px;
+      min-height: 180px;
+      max-height: 260px;
+      overflow: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .8rem;
+      line-height: 1.5;
     }
+
     .muted { color: var(--muted); }
-    .divider { height: 1px; background: var(--line); margin: 14px 0; }
-    .pill-row { display: flex; gap: 8px; flex-wrap: wrap; }
-    .pill {
-      padding: 8px 11px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); font-size: .8rem; font-weight: 600;
+
+    .divider {
+      height: 1px;
+      background: var(--line);
+      margin: 14px 0;
     }
+
+    .pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      font-size: .8rem;
+      font-weight: 600;
+    }
+
     .desktop-grid { display: grid; gap: 16px; }
 
+    .panel-span { grid-column: 1 / -1; }
+
     @media (min-width: 760px) {
-      .hero { grid-template-columns: 1.2fr .8fr; }
-      .mqtt-grid, .sys-grid { grid-template-columns: repeat(2, 1fr); }
       .desktop-grid.two { grid-template-columns: 1.1fr .9fr; }
       .desktop-grid.arm { grid-template-columns: 1.1fr .9fr; }
-      .sensor-grid { grid-template-columns: repeat(4, 1fr); }
+      .system-layout { grid-template-columns: 1fr 1fr; }
+      .mqtt-grid, .sys-grid { grid-template-columns: repeat(2, 1fr); }
+      .sensor-grid { grid-template-columns: repeat(3, 1fr); }
       .app { padding: 22px 22px calc(var(--tabbar-h) + 24px); }
     }
   </style>
@@ -203,55 +435,31 @@
         </div>
         <div>
           <h1>Iris Control Center</h1>
-          <p>GUI pública · MQTT · móvil primero</p>
+          <p>GUI pública · operación limpia · configuración separada</p>
         </div>
       </div>
       <div class="actions-top">
         <button class="icon-btn" id="themeToggle" aria-label="Cambiar tema">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3c0 0 0 0 0 0A7 7 0 0 0 21 12.79Z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3c0 0 0 0 0 0A7 7 0 0 0 21 12.79Z"/>
+          </svg>
         </button>
       </div>
     </header>
 
     <section class="hero">
       <div class="panel">
-        <div class="badge"><span class="dot" id="heroDot"></span><span id="heroStatus">Broker desconectado</span></div>
-        <h2 style="margin:12px 0 8px; font-size:1.35rem;">Control remoto del robot médico</h2>
+        <div class="section-title">
+          <div>
+            <h2>Control remoto del robot médico</h2>
+            <p>Panel principal de operación. La conexión del broker vive solo en Sistema.</p>
+          </div>
+        </div>
         <div class="status-strip">
           <div class="mini-card"><span>Velocidad actual</span><strong id="speedModeLabel">medium</strong></div>
           <div class="mini-card"><span>Modo</span><strong id="modeLabel">manual</strong></div>
           <div class="mini-card"><span>Última orden</span><strong id="lastActionLabel">Ninguna</strong></div>
           <div class="mini-card"><span>Robot</span><strong id="robotLabel">offline</strong></div>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="section-title">
-          <div>
-            <h2>Conexión MQTT</h2>
-            <p>Broker público por WebSocket</p>
-          </div>
-        </div>
-        <div class="mqtt-grid">
-          <div class="input-group">
-            <label for="brokerUrl">Broker URL</label>
-            <input id="brokerUrl" class="input" value="wss://broker.emqx.io:8084/mqtt" />
-          </div>
-          <div class="input-group">
-            <label for="topicPrefix">Prefijo de topics</label>
-            <input id="topicPrefix" class="input" value="iris/unbosque/demo01" />
-          </div>
-          <div class="input-group">
-            <label for="clientId">Client ID</label>
-            <input id="clientId" class="input" />
-          </div>
-          <div class="input-group">
-            <label for="operatorName">Operador</label>
-            <input id="operatorName" class="input" value="gui-publica" />
-          </div>
-        </div>
-        <div class="button-row" style="margin-top:12px;">
-          <button class="btn btn-primary" id="connectBtn">Conectar</button>
-          <button class="btn btn-secondary" id="disconnectBtn">Desconectar</button>
         </div>
       </div>
     </section>
@@ -266,6 +474,7 @@
                 <p>Comandos discretos para tracción diferencial</p>
               </div>
             </div>
+
             <div class="dpad" aria-label="Controles de movimiento">
               <div></div>
               <button class="move primary" data-move="forward">Avanzar</button>
@@ -277,19 +486,24 @@
               <button class="move" data-move="backward">Retroceder</button>
               <div></div>
             </div>
+
             <div class="divider"></div>
+
             <div class="section-title">
               <div>
                 <h2>Velocidad</h2>
                 <p>Selecciona el modo de marcha</p>
               </div>
             </div>
+
             <div class="speed-grid">
               <button class="speed-btn" data-speed="low">Baja</button>
               <button class="speed-btn active" data-speed="medium">Media</button>
               <button class="speed-btn" data-speed="high">Alta</button>
             </div>
+
             <div class="divider"></div>
+
             <div class="button-row">
               <button class="btn btn-secondary" id="softStopBtn">Parada normal</button>
               <button class="btn btn-danger" id="estopBtn">Paro de emergencia</button>
@@ -300,19 +514,14 @@
             <div class="section-title">
               <div>
                 <h2>Resumen operativo</h2>
-                <p>Estado rápido para pruebas</p>
+                <p>Solo información útil para manejo rápido</p>
               </div>
             </div>
-            <div class="pill-row" style="margin-bottom:12px;">
-              <div class="pill">Topic move: <strong>cmd/move</strong></div>
-              <div class="pill">Topic speed: <strong>cmd/speed_mode</strong></div>
-              <div class="pill">Topic estop: <strong>cmd/estop</strong></div>
-            </div>
             <div class="sys-grid">
-              <div class="mini-card"><span>Conexión GUI</span><strong id="guiState">disconnected</strong></div>
-              <div class="mini-card"><span>Último publish</span><strong id="lastPublish">-</strong></div>
+              <div class="mini-card"><span>Operador</span><strong id="operatorLabel">gui-publica</strong></div>
               <div class="mini-card"><span>Último estado drive</span><strong id="driveState">-</strong></div>
               <div class="mini-card"><span>Último heartbeat</span><strong id="heartbeat">-</strong></div>
+              <div class="mini-card"><span>E-stop local</span><strong id="estopQuick">false</strong></div>
             </div>
           </div>
         </div>
@@ -374,16 +583,17 @@
                 <p>Secuencias que la Raspberry interpretará mañana</p>
               </div>
             </div>
+
             <div class="arm-actions">
               <button class="btn btn-success arm-action" data-action="home">HOME</button>
               <button class="btn btn-danger soft arm-action" data-action="cero_todos">Cero todos</button>
               <button class="btn btn-secondary arm-action" data-action="saludo">Saludo</button>
               <button class="btn btn-secondary arm-action" data-action="caminar">Caminar</button>
             </div>
+
             <div class="divider"></div>
-            <div class="mini-card"><span>Topic manual</span><strong>cmd/arm/manual</strong></div>
-            <div class="mini-card" style="margin-top:10px;"><span>Topic acciones</span><strong>cmd/arm/action</strong></div>
-            <div class="mini-card" style="margin-top:10px;"><span>Último preset</span><strong id="lastPreset">-</strong></div>
+
+            <div class="mini-card"><span>Último preset</span><strong id="lastPreset">-</strong></div>
           </div>
         </div>
       </section>
@@ -396,36 +606,79 @@
               <p>Tarjetas compactas para feedback y futura base de datos</p>
             </div>
           </div>
+
           <div class="sensor-grid">
             <div class="sensor-card"><span>Temperatura</span><strong id="tempValue">-- °C</strong><small>Última act.: --</small></div>
             <div class="sensor-card"><span>SpO2</span><strong id="spo2Value">-- %</strong><small>Última act.: --</small></div>
             <div class="sensor-card"><span>Frecuencia cardiaca</span><strong id="hrValue">-- bpm</strong><small>Última act.: --</small></div>
           </div>
+
           <div class="divider"></div>
+
           <div class="pill-row">
-            <div class="pill">Topic: <strong>state/sensors</strong></div>
-            <div class="pill">Listo para Supabase/Influx más adelante</div>
+            <div class="pill">Monitoreo biométrico en tiempo real</div>
+            <div class="pill">Listo para base de datos más adelante</div>
           </div>
         </div>
       </section>
 
       <section id="screen-system" class="screen">
-        <div class="desktop-grid two">
+        <div class="system-layout">
+          <div class="panel">
+            <div class="section-title">
+              <div>
+                <h2>Configuración MQTT</h2>
+                <p>Aquí queda toda la parte técnica del broker</p>
+              </div>
+            </div>
+
+            <div class="mqtt-grid">
+              <div class="input-group">
+                <label for="brokerUrl">Broker URL</label>
+                <input id="brokerUrl" class="input" value="wss://broker.emqx.io:8084/mqtt" />
+              </div>
+
+              <div class="input-group">
+                <label for="topicPrefix">Prefijo de topics</label>
+                <input id="topicPrefix" class="input" value="iris/unbosque/demo01" />
+              </div>
+
+              <div class="input-group">
+                <label for="clientId">Client ID</label>
+                <input id="clientId" class="input" />
+              </div>
+
+              <div class="input-group">
+                <label for="operatorName">Operador</label>
+                <input id="operatorName" class="input" value="gui-publica" />
+              </div>
+            </div>
+
+            <div class="button-row" style="margin-top:12px;">
+              <button class="btn btn-primary" id="connectBtn">Conectar</button>
+              <button class="btn btn-secondary" id="disconnectBtn">Desconectar</button>
+            </div>
+          </div>
+
           <div class="panel">
             <div class="section-title">
               <div>
                 <h2>Estado del sistema</h2>
-                <p>Variables útiles para depuración mañana</p>
+                <p>Variables útiles para depuración y operación</p>
               </div>
             </div>
+
             <div class="sys-grid">
               <div class="mini-card"><span>Broker</span><strong id="brokerState">desconectado</strong></div>
+              <div class="mini-card"><span>Sesión GUI</span><strong id="guiState">disconnected</strong></div>
               <div class="mini-card"><span>Robot online</span><strong id="robotOnline">false</strong></div>
+              <div class="mini-card"><span>Último publish</span><strong id="lastPublish">-</strong></div>
               <div class="mini-card"><span>Modo reportado</span><strong id="systemMode">manual</strong></div>
               <div class="mini-card"><span>Estop reportado</span><strong id="estopState">false</strong></div>
             </div>
           </div>
-          <div class="panel">
+
+          <div class="panel panel-span">
             <div class="section-title">
               <div>
                 <h2>Log MQTT</h2>
@@ -481,12 +734,15 @@
       box.innerHTML = `<div style="color:${color}">[${stamp()}] ${message}</div>` + box.innerHTML;
     }
 
+    function syncOperatorUi() {
+      const label = $('#operatorLabel');
+      if (label) label.textContent = state.operator;
+    }
+
     function setConnectionUi(connected) {
       state.connected = connected;
       $('#guiState').textContent = connected ? 'connected' : 'disconnected';
       $('#brokerState').textContent = connected ? 'conectado' : 'desconectado';
-      $('#heroStatus').textContent = connected ? 'Broker conectado' : 'Broker desconectado';
-      $('#heroDot').classList.toggle('online', connected);
     }
 
     function updateLastAction(text) {
@@ -500,8 +756,10 @@
         log('No hay conexión MQTT para publicar en ' + suffix, 'error');
         return;
       }
+
       const topic = `${state.topicPrefix}/${suffix}`;
       const body = JSON.stringify(payload);
+
       state.client.publish(topic, body);
       updateLastAction(suffix);
       log(`PUB ${topic} -> ${body}`, 'ok');
@@ -511,6 +769,8 @@
       const brokerUrl = $('#brokerUrl').value.trim();
       state.topicPrefix = $('#topicPrefix').value.trim().replace(/\/$/, '');
       state.operator = $('#operatorName').value.trim() || 'gui-publica';
+      syncOperatorUi();
+
       const clientId = $('#clientId').value.trim() || `iris_gui_${Math.random().toString(16).slice(2, 10)}`;
       $('#clientId').value = clientId;
 
@@ -519,22 +779,26 @@
           state.client.end(true);
           state.client = null;
         }
+
         const client = mqtt.connect(brokerUrl, {
           clientId,
           clean: true,
           connectTimeout: 5000,
           reconnectPeriod: 2000
         });
+
         state.client = client;
 
         client.on('connect', () => {
           setConnectionUi(true);
           log('Conexión MQTT establecida', 'ok');
+
           const subs = [
             `${state.topicPrefix}/state/system`,
             `${state.topicPrefix}/state/drive`,
             `${state.topicPrefix}/state/sensors`
           ];
+
           client.subscribe(subs, (err) => {
             if (err) log('Error al suscribirse: ' + err.message, 'error');
             else log('Suscrito a topics de estado', 'ok');
@@ -561,8 +825,10 @@
 
     function handleIncoming(topic, raw) {
       log(`SUB ${topic} -> ${raw}`);
+
       try {
         const data = JSON.parse(raw);
+
         if (topic.endsWith('/state/system')) {
           $('#robotOnline').textContent = String(!!data.online);
           $('#robotLabel').textContent = data.online ? 'online' : 'offline';
@@ -571,6 +837,7 @@
           $('#estopState').textContent = String(!!data.estop);
           $('#heartbeat').textContent = stamp();
         }
+
         if (topic.endsWith('/state/drive')) {
           $('#driveState').textContent = data.speed_mode || '-';
           if (data.speed_mode) {
@@ -578,11 +845,16 @@
             setSpeedUi(data.speed_mode);
           }
         }
+
         if (topic.endsWith('/state/sensors')) {
           if (typeof data.temp !== 'undefined') $('#tempValue').textContent = `${data.temp} °C`;
           if (typeof data.spo2 !== 'undefined') $('#spo2Value').textContent = `${data.spo2} %`;
           if (typeof data.hr !== 'undefined') $('#hrValue').textContent = `${data.hr} bpm`;
-          const time = data.updated_at ? new Date(data.updated_at * 1000).toLocaleTimeString() : stamp();
+
+          const time = data.updated_at
+            ? new Date(data.updated_at * 1000).toLocaleTimeString()
+            : stamp();
+
           $$('#screen-sensors small').forEach(el => el.textContent = `Última act.: ${time}`);
         }
       } catch (e) {
@@ -642,6 +914,7 @@
       const root = document.documentElement;
       let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       root.setAttribute('data-theme', theme);
+
       $('#themeToggle').addEventListener('click', () => {
         theme = theme === 'dark' ? 'light' : 'dark';
         root.setAttribute('data-theme', theme);
@@ -654,16 +927,29 @@
       setupTheme();
       updateServoLabels();
       setSpeedUi('medium');
+      syncOperatorUi();
 
       $('#connectBtn').addEventListener('click', connectMqtt);
       $('#disconnectBtn').addEventListener('click', disconnectMqtt);
-      $('#softStopBtn').addEventListener('click', () => publish('cmd/stop', { active: true, source: state.operator, ts: nowTs() }));
+
+      $('#operatorName').addEventListener('input', (e) => {
+        state.operator = e.target.value.trim() || 'gui-publica';
+        syncOperatorUi();
+      });
+
+      $('#softStopBtn').addEventListener('click', () => {
+        publish('cmd/stop', { active: true, source: state.operator, ts: nowTs() });
+      });
+
       $('#estopBtn').addEventListener('click', () => {
         state.estop = !state.estop;
         publish('cmd/estop', { active: state.estop, source: state.operator, ts: nowTs() });
         $('#estopState').textContent = String(state.estop);
+        $('#estopQuick').textContent = String(state.estop);
       });
+
       $('#sendArmBtn').addEventListener('click', sendArmManual);
+
       $('#resetArmBtn').addEventListener('click', () => {
         $('#servo1').value = 152;
         $('#servo2').value = 112;
@@ -676,7 +962,7 @@
       $$('.speed-btn').forEach(btn => btn.addEventListener('click', () => setSpeed(btn.dataset.speed)));
       $$('.arm-action').forEach(btn => btn.addEventListener('click', () => sendArmAction(btn.dataset.action)));
 
-      log('GUI lista. Configura broker, conecta y prueba publishes.');
+      log('GUI lista. Toda la configuración MQTT quedó centralizada en la pestaña Sistema.');
     }
 
     boot();
